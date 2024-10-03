@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt");
+
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -10,6 +12,8 @@ const userSchema = new mongoose.Schema({
         minLength: 3,
         maxLength: 30
     },
+    //this is VERY bad practice of storing passwords without hashing (and adding salt) them. Don't do this in prod (it's illegal too in places)
+    //Password logic handled at =  routes/user.js and db.js 
     password: {
         type: String,
         required: true,
