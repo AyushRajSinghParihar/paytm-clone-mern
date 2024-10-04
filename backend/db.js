@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
         minLength: 3,
         maxLength: 30
     },
-    //this is VERY bad practice of storing passwords without hashing (and adding salt) them. Don't do this in prod (it's illegal too in places)
+    //this is a bad practice of storing passwords without hashing (and adding salt) them. Don't do this in prod (it's illegal too in places)
     //Password logic handled at =  routes/user.js and db.js 
     password: {
         type: String,
@@ -33,8 +33,23 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+const accountSchema = new mongoose.Schema({
+    userId: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required:true},
+    balance: {
+        type:Number, 
+        required:true
+    } 
+
+});
+
+
+const Account= mongoose.model('Accounts', accountSchema);
 const User = mongoose.model('User', userSchema);
 
 module.exports = {
-	User
+	User,
+    Account
 };
