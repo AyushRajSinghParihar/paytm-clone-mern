@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const zod = require("zod");
-const { User } = require('../db.js');
+const { User, Account } = require('../db.js');
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config.js");
 const authMiddleware = require('../middleware.js');
+
+
 
 
 const signupSchema = zod.object({
@@ -37,7 +39,12 @@ router.post("/signup", async (req,res) => {
     const token = jwt.sign({
         userId: dbUser._id
     }, JWT_SECRET)
-
+    //Create account and give user a fake balance anywhere between 1 and 10000
+    const userId= dbUser._id
+    await Account.create({
+        userId,
+        balance:1+Math.random()*10000
+    })
     res.status(201).json({
         message: "User created successfully",
         token: token
@@ -106,9 +113,16 @@ router.put("/", authMiddleware, async (req,res)=> {
 })
 
 router.get("/bulk", authMiddleware, async(req,res) => {
-    const filter = req.query.filter;
+    const filter = req.query.filter || "";
+
     const users= await User.find({
-        $or:[{'firstName':{"$regex":filter,$options: 'i'}},{'lastName':{"$regex":filter,$options: 'i'}}]
+        $or:[{
+            'firstName':
+            {
+            "$regex":filter, $options: 'i'
+        }},{'lastName':{
+            "$regex":filter, $options: 'i'
+        }}]
     })
 
     res.json({
